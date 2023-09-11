@@ -142,3 +142,13 @@ join(
     )
     |> to(bucket: "PDR", org: "elora") 
 ```
+#### Query 4: PDR Over Time      
+```Flux
+from(bucket: "PDR")
+  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)
+  |> filter(fn: (r) => r["_measurement"] == "PDR")
+  |> filter(fn: (r) => r["_field"] == "Ratio")
+  |> group(columns: ["_Device"])
+  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)
+  |> yield(name: "mean") 
+```
