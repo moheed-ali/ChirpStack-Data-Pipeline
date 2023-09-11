@@ -102,4 +102,43 @@ from(bucket: "upevent")
   |> yield(name: "mean")
   
 ```
+#### Task 1: Save PDR to new Bucket 
+```Flux
+option task = {
+    name: "save_pdr",
+    every: 5m,
+}
 
+total_missed = from(bucket: "upevent")
+    |> range(start: -task.every)
+    |> filter(fn: (r) => r["_field"] == "F_count")
+    |> group(columns: ["Device_Name"])
+    |> sort(columns: ["_value"], desc: false)
+    |> difference(nonNegative: false, columns: ["_value"])
+    |> map(fn: (r) => ({r with _frame_missed: r._value - 1}))
+    |> sum(column: "_frame_missed")
+
+//|> yield(name: "result")
+total_received = from(bucket: "upevent")
+    |> range(start: -task.every)
+    |> filter(fn: (r) => r["_field"] == "F_count")
+    |> group(columns: ["Device_Name"])
+    |> count(column: "_value")
+    |> rename(columns: {_value: "_total_received"})
+
+//|> yield(name: "result")
+join(
+    tables: {total_missed: total_missed, total_received: total_received},
+    on: ["Device_Name"],
+)
+    |> map(
+        fn: (r) => ({
+            _time: now(),
+            _measurement: "PDR",
+            _field: "Ratio",
+            _Device: r.Device_Name,
+            _value: if r._total_received == 0.0 then 0.0 else float(v: r._total_received) / (float(v: r._frame_missed) + float(v: r._total_received)) * 100.0,
+        }),
+    )
+    |> to(bucket: "PDR", org: "elora") 
+```
