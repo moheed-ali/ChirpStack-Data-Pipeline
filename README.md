@@ -1,7 +1,3 @@
-# ...
-
-....
-
 ## InfluxDB Query
 
 ### Introduction
@@ -18,7 +14,6 @@
 Here are some sample InfluxDB queries that you can use as a reference:
 
 #### Query 1: Devices PDR
-
 ```Flux
 
   from(bucket: "upevent")
@@ -68,4 +63,27 @@ join(
    Device: r.Device_Name,
    PDR: if r._total_received == 0.0 then 0.0 else float(v:r._total_received) / (float(v: r._frame_missed) + float(v: r._total_received)) * 100.0
  }))
-|> yield(name: "result")  
+|> yield(name: "result")
+
+``` 
+#### Query 2: Total Number of Active Devices  
+
+```Flux
+from(bucket: "upevent")
+  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)
+  |> filter(fn: (r) => r["_measurement"] == "my_measurement")
+  |> group(columns: ["Gateway_ID"])
+  |> unique(column: "Device_Name") 
+  |> count(column: "Device_Name")
+  |> map(fn: (r) => ({
+    _time: r._time,
+    Gateway_ID: r.Gateway_ID,
+    No_of_Devices: r.Device_Name,
+  }))
+  |> drop(columns: ["_value"])
+  |> yield(name: "mean")
+  
+
+```
+
+
