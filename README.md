@@ -82,8 +82,24 @@ from(bucket: "upevent")
   }))
   |> drop(columns: ["_value"])
   |> yield(name: "mean")
-  
 
 ```
-
+#### Query 3: No. of Devices In each SF of each Gateway 
+```Flux
+from(bucket: "upevent")
+  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)
+  |> filter(fn: (r) => r["_measurement"] == "my_measurement")
+  |> group(columns: ["Gateway_ID", "Spreading_factor"], mode: "by")
+  |> unique(column: "Device_Name") 
+  |> count(column: "Device_Name")
+  |> map(fn: (r) => ({
+    _time: r._time,
+    Gateway_ID: r.Gateway_ID,
+    Spreading_factor: r.Spreading_factor,
+    No_of_Devices: r.Device_Name,
+  }))
+  |> drop(columns: ["_value"])
+  |> yield(name: "mean")
+  
+```
 
