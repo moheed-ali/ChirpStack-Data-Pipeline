@@ -152,3 +152,53 @@ from(bucket: "PDR")
   |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)
   |> yield(name: "mean") 
 ```
+#### Query 5: Network PDR      
+```Flux
+total_missed = from(bucket: "upevent")
+ |> range(start: v.timeRangeStart, stop: v.timeRangeStop)
+ |> filter(fn: (r) => r["_field"] == "F_count")
+ |> group (columns: ["Device_Name"])
+ |> sort(columns: ["_value"], desc: false)
+ |> difference(nonNegative: false, columns: ["_value"])
+ |> map(fn: (r) => ({r with _frame_missed: r._value - 1}))
+ |> sum(column: "_frame_missed") 
+ //|> yield(name: "result")
+
+total_received = from(bucket: "upevent")
+ |> range(start: v.timeRangeStart, stop: v.timeRangeStop)
+ |> filter(fn: (r) => r["_field"] == "F_count")
+ |> group (columns: ["Device_Name"])
+ |> count(column: "_value")
+ |> rename(columns: {_value: "_total_received"})
+ //|> yield(name: "result")
+
+
+combined_table = join(
+  tables: {total_missed: total_missed, total_received: total_received},
+  on: ["Device_Name"]
+) 
+|> map(fn: (r) => ({
+   _time: now(),
+   Device: r.Device_Name,
+   sum_total_rec: r._total_received,
+   sum_total_send: r._total_received + r._frame_missed
+ }))
+ 
+|> reduce(
+   fn: (r, accumulator) => ({
+     sum_total_rec: r.sum_total_rec + accumulator.sum_total_rec,
+     sum_total_send: r.sum_total_send + accumulator.sum_total_send,
+   }),
+   identity: {sum_total_rec: 0, sum_total_send: 0}
+ )
+ 
+|> map(fn: (r) => ({
+   _time: now(),
+   Device: r.Device,
+   Total_Packets_Received: r.sum_total_rec,
+   Total_Packets_Send: r.sum_total_send,
+   Total_Packets_Missed: r.sum_total_send - r.sum_total_rec,
+   Ratio: (float(v: r.sum_total_rec) / float(v: r.sum_total_send)) * 100.0
+ }))
+|> yield(name: "result")
+```
