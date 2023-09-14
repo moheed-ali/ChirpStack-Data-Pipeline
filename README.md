@@ -13,6 +13,17 @@
 
 Here are some sample InfluxDB queries that you can use as a reference:
 
+### HTTP Port
+```bash
+http://163.173.230.90:8081
+```
+
+
+### InfluxDB Port
+```bash
+http://163.173.230.90:8086
+```
+
 ### InfluxDB Docker Volume Command 
 ```bash
 docker run \
