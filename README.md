@@ -33,6 +33,14 @@ docker run \
     influxdb:2.0.9
 ```
 
+```bash
+docker run \
+    --name grafana \
+    -p 3000:3000 \
+    -v \etudiants\siscol\k\kayan_mo\Documents\data\grafana-docker-data-volume:/var/lib/grafana \
+    grafana/grafana:8.3.1
+```
+
 #### Query 1: Devices PDR
 ```Flux
 
