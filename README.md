@@ -13,6 +13,15 @@
 
 Here are some sample InfluxDB queries that you can use as a reference:
 
+### InfluxDB Docker Volume Command 
+```bash
+docker run \
+    --name influxdb \
+    -p 8086:8086 \
+    --volume \etudiants\siscol\k\kayan_mo\Documents\data\influxdb-docker-data-volume:/var/lib/influxdb2 \
+    influxdb:2.0.9
+```
+
 #### Query 1: Devices PDR
 ```Flux
 
