@@ -18,14 +18,41 @@ Before you begin, ensure you have the following prerequisites:
    ```bash
    git clone https://github.com/moheed-ali/ChirpStack-InfluxDB.git
    ```
-2. **Install Required Packages**:
+2. **Create a Python Virtual Environment** (Recommended):
+
+   - To isolate your project's dependencies, consider creating a Python virtual environment. This is especially useful when working on multiple Python projects with different dependencies.
+
+   - Create a virtual environment using the following command:
+
+     ```bash
+     python -m venv myenv  # Replace 'myenv' with your preferred virtual environment name
+     ```
+
+   - Activate the virtual environment:
+
+     ```bash
+     source myenv/bin/activate  # Linux/Mac
+     ```
+
+     ```bash
+     myenv\Scripts\activate  # Windows
+     ```
+
+   - Now, you can install and run the script (`main.py`) within the virtual environment.
+
+By following these steps, you can resolve the missing `builder.py` error and create a clean Python virtual environment to work with the `main.py` file.
+
+This updated note provides information about creating a Python virtual environment, which is a recommended practice for isolating project dependencies and ensuring a clean environment for your Python script (main.py).
+ 
+
+3. **Install Required Packages**:
    
    - Navigate to the project directory and install the required Python packages using pip.
     ```bash
    cd ChirpStack-InfluxDB
    pip install -r requirements.txt
    ```
-3. **Edit Configuration:**:
+4. **Edit Configuration:**:
    - `bucket`: The InfluxDB bucket where data will be stored. You should set this variable to the name of the InfluxDB bucket where you want to store the incoming data.
 
    - `org`: The InfluxDB organization. Set this variable to your InfluxDB organization's name.
@@ -36,19 +63,17 @@ Before you begin, ensure you have the following prerequisites:
 
    - `csv_filename`: The name of the CSV file where data will be logged. You can specify a custom name for the CSV file where the script will log data.
 
-4. **Save the Changes**:
+5. **Save the Changes**:
 
    - After making the necessary modifications, save the Python script.
      
-5. **Run The Script**:
+6. **Run The Script**:
 
    - After making the necessary modifications, save the Python script.
   
      ```bash
      python main.py    
      ```
-
-For instructions on adding InfluxDB as a datasource in Grafana, please refer to the [Steps to Add InfluxDB as a Datasource in Grafana](influxdb-grafana-setup.md) section.
 
 **Note**: If you are using Python version less than 3.7, you may encounter an error indicating that the `builder.py` file is missing in one of the Google Protocol Buffers libraries. In such cases, you can follow these steps:
 
@@ -65,6 +90,9 @@ For instructions on adding InfluxDB as a datasource in Grafana, please refer to 
    - Paste the copied `builder.py` file into this location.
 
 This should resolve the missing `builder.py` error when using Python versions less than 3.7.
+
+
+For instructions on adding InfluxDB as a datasource in Grafana, please refer to the [Steps to Add InfluxDB as a Datasource in Grafana](influxdb-grafana-setup.md) section.
 
 
 ### Introduction
