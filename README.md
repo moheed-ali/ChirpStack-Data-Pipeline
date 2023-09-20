@@ -84,9 +84,12 @@ Before you begin, ensure you have the following prerequisites:
 
    - Paste the copied `builder.py` file into this location.
 
-This should resolve the missing `builder.py` error when using Python versions less than 3.7.
+This should resolve the missing `builder.py` error when using Python versions less than 3.7.  
 
-For instructions on adding Running InfluxDB & Grafana Docker Volumes, please refer to the [Steps to Add Run InfluxDB & Grafana Docker Volumes](InfluxDB-Grafana-Docker-Volume.md) section.
-For instructions on adding InfluxDB as a datasource in Grafana, please refer to the [Steps to Add InfluxDB as a Datasource in Grafana](influxdb-grafana-data-source-setup.md) section.
+For instructions on running InfluxDB & Grafana Docker Volumes, please refer to the [Steps to Add Run InfluxDB & Grafana Docker Volumes](InfluxDB-Grafana-Docker-Volume.md) section.  
+
+For instructions on adding InfluxDB as a datasource in Grafana, please refer to the [Steps to Add InfluxDB as a Datasource in Grafana](influxdb-grafana-data-source-setup.md) section.  
+
+For instructions on computing PDR using Flux Queries, please refer to the [Flux Queries to Compute PDR](PDR-Flux-Queries.md) section.
 
 
