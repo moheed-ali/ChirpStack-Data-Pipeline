@@ -1,3 +1,23 @@
+# How to Run the Python Code for InfluxDB Data Ingestion & Grafana Integration
+This README guide will walk you through the process of running the provided Python code to ingest data into InfluxDB using the ChirpStack API. The code listens for incoming ChirpStack events (uplinks and joins), processes the data, and stores it in InfluxDB. Here are the steps to run the code:
+
+## Prerequisites
+
+Before you begin, ensure you have the following prerequisites:
+
+- **Python Installed**: You need to have Python installed on your system. You can download Python from the [official website](https://www.python.org/downloads/).
+
+- **InfluxDB and ChirpStack Setup**: Make sure you have InfluxDB and ChirpStack (LoRaWAN Network Server) set up and running. You will need to configure InfluxDB and obtain the necessary InfluxDB token and URL.
+
+## Steps to Run the Python Code
+
+1. **Clone the Repository**:
+
+   - Clone the repository containing the Python code to your local machine.
+
+   ```bash
+   git clone <repository_url>
+
 
 
 ### Introduction
