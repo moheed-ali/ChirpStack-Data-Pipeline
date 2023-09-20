@@ -39,8 +39,32 @@ Before you begin, ensure you have the following prerequisites:
 4. **Save the Changes**:
 
    - After making the necessary modifications, save the Python script.
+     
+5. **Run The Script**:
+
+   - After making the necessary modifications, save the Python script.
+  
+     ```bash
+     python main.py    
+     ```
 
 For instructions on adding InfluxDB as a datasource in Grafana, please refer to the [Steps to Add InfluxDB as a Datasource in Grafana](influxdb-grafana-setup.md) section.
+
+**Note**: If you are using Python version less than 3.7, you may encounter an error indicating that the `builder.py` file is missing in one of the Google Protocol Buffers libraries. In such cases, you can follow these steps:
+
+1. **Copy the `builder.py` File**:
+   
+   - Locate the `builder.py` file within the repository.
+
+   - Copy the `builder.py` file to your clipboard.
+
+3. **Paste the `builder.py` File**:
+
+   - Navigate to the location where the missing `builder.py` file is required in your Python environment.
+
+   - Paste the copied `builder.py` file into this location.
+
+This should resolve the missing `builder.py` error when using Python versions less than 3.7.
 
 
 ### Introduction
