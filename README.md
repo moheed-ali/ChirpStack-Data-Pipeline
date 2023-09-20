@@ -74,16 +74,7 @@ For instructions on running InfluxDB & Grafana Docker Volumes, please refer to t
 
 For instructions on adding InfluxDB as a datasource in Grafana, please refer to the [Steps to Add InfluxDB as a Datasource in Grafana](influxdb-grafana-data-source-setup.md) section.  
 
-For instructions on computing PDR using Flux Queries, please refer to the [Flux Queries to Compute PDR](PDR-Flux-Queries.md) section.
-
-
-## Contributing
-
-Feel free to contribute to this project by creating pull requests. For major changes, please open an issue first to discuss the proposed changes.
-
-## License
-
-This project is licensed under the [MIT License](LICENSE).
+For instructions on computing PDR using Flux Queries, please refer to the [Flux Queries to Compute PDR](PDR-Flux-Queries.md) section.  
 
 **Note**: If you are using Python version less than 3.7, you may encounter an error indicating that the `builder.py` file is missing in one of the Google Protocol Buffers libraries. In such cases, you can follow these steps:
 
@@ -100,3 +91,12 @@ This project is licensed under the [MIT License](LICENSE).
    - Paste the copied `builder.py` file into this location.
 
 This should resolve the missing `builder.py` error when using Python versions less than 3.7.  
+
+## Contributing
+
+Feel free to contribute to this project by creating pull requests. For major changes, please open an issue first to discuss the proposed changes.
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).
+
