@@ -34,7 +34,6 @@
 
 6. **Success**:
    - If the connection test is successful, you've successfully added InfluxDB as a datasource in Grafana.
-   - 
-For instructions on running InfluxDB & Grafana Docker Volumes, please refer to the [Steps to Add Run InfluxDB & Grafana Docker Volumes](InfluxDB-Grafana-Docker-Volume.md) section.   
+      
 
 For instructions on computing PDR using Flux Queries, please refer to the [Flux Queries to Compute PDR](PDR-Flux-Queries.md) section.
