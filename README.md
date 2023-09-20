@@ -87,7 +87,7 @@ Before you begin, ensure you have the following prerequisites:
 This should resolve the missing `builder.py` error when using Python versions less than 3.7.
 
 
-For instructions on adding InfluxDB as a datasource in Grafana, please refer to the [Steps to Add InfluxDB as a Datasource in Grafana](influxdb-grafana-setup.md) section.
+For instructions on adding InfluxDB as a datasource in Grafana, please refer to the [Steps to Add InfluxDB as a Datasource in Grafana](influxdb-grafana-data-source-setup.md) section.
 
 
 ### Introduction
