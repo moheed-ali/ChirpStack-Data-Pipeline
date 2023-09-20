@@ -16,7 +16,7 @@ Before you begin, ensure you have the following prerequisites:
    - Clone the repository containing the Python code to your local machine.
 
    ```bash
-   git clone <repository_url>
+   git clone https://github.com/moheed-ali/ChirpStack-InfluxDB.git```
 
 
 
