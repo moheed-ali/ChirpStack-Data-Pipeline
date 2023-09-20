@@ -93,3 +93,11 @@ For instructions on adding InfluxDB as a datasource in Grafana, please refer to 
 For instructions on computing PDR using Flux Queries, please refer to the [Flux Queries to Compute PDR](PDR-Flux-Queries.md) section.
 
 
+## Contributing
+
+Feel free to contribute to this project by creating pull requests. For major changes, please open an issue first to discuss the proposed changes.
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).
+
