@@ -38,12 +38,7 @@ Before you begin, ensure you have the following prerequisites:
      myenv\Scripts\activate  # Windows
      ```
 
-   - Now, you can install and run the script (`main.py`) within the virtual environment.
-
-By following these steps, you can resolve the missing `builder.py` error and create a clean Python virtual environment to work with the `main.py` file.
-
-This updated note provides information about creating a Python virtual environment, which is a recommended practice for isolating project dependencies and ensuring a clean environment for your Python script (main.py).
- 
+   - Now, you can install and run the script (`main.py`) within the virtual environment. 
 
 3. **Install Required Packages**:
    
