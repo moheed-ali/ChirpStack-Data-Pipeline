@@ -1,5 +1,8 @@
 
 ## Flux Queries
+
+These Queries will Display the results on InfluxDB Or Grafana
+
 #### Query 1: Devices PDR
 ```Flux
 
