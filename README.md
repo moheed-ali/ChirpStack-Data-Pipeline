@@ -86,22 +86,9 @@ Before you begin, ensure you have the following prerequisites:
 
 This should resolve the missing `builder.py` error when using Python versions less than 3.7.
 
-For instructions on adding Running InfluxDB & Grafana Docker Volumes, please refer to the [Steps to Add Run InfluxDB & Grafana Docker Volumes](influxdb-grafana-data-source-setup.md) section.
+For instructions on adding Running InfluxDB & Grafana Docker Volumes, please refer to the [Steps to Add Run InfluxDB & Grafana Docker Volumes](InfluxDB-Grafana-Docker-Volume.md) section.
 For instructions on adding InfluxDB as a datasource in Grafana, please refer to the [Steps to Add InfluxDB as a Datasource in Grafana](influxdb-grafana-data-source-setup.md) section.
 
-
-### Introduction
-
-....
-
-
-### Prerequisites
-
-....
-
-### Sample Queries
-
-Here are some sample InfluxDB queries that you can use as a reference:
 
 
 ## Flux Queries
