@@ -25,7 +25,20 @@ Before you begin, ensure you have the following prerequisites:
    cd ChirpStack-InfluxDB
    pip install -r requirements.txt
    ```
-4. 
+3. **Edit Configuration:**:
+   - `bucket`: The InfluxDB bucket where data will be stored. You should set this variable to the name of the InfluxDB bucket where you want to store the incoming data.
+
+   - `org`: The InfluxDB organization. Set this variable to your InfluxDB organization's name.
+
+   - `token`: The InfluxDB token for authentication. Replace this variable with your InfluxDB authentication token. You can obtain this token from your InfluxDB instance.
+
+   - `url`: The URL of your InfluxDB instance. Update this variable to the URL of your InfluxDB server. The default value is often `http://localhost:8086` if running locally.
+
+   - `csv_filename`: The name of the CSV file where data will be logged. You can specify a custom name for the CSV file where the script will log data.
+
+4. **Save the Changes**:
+
+   - After making the necessary modifications, save the Python script.
 
 
 ### Introduction
