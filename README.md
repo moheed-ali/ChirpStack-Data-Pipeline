@@ -16,8 +16,16 @@ Before you begin, ensure you have the following prerequisites:
    - Clone the repository containing the Python code to your local machine.
 
    ```bash
-   git clone https://github.com/moheed-ali/ChirpStack-InfluxDB.git```
-
+   git clone https://github.com/moheed-ali/ChirpStack-InfluxDB.git
+   ```
+2. **Install Required Packages**:
+   
+   - Navigate to the project directory and install the required Python packages using pip.
+    ```bash
+   cd ChirpStack-InfluxDB
+   pip install -r requirements.txt
+   ```
+4. 
 
 
 ### Introduction
