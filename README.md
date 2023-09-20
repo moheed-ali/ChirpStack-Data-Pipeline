@@ -40,6 +40,8 @@ Before you begin, ensure you have the following prerequisites:
 
    - After making the necessary modifications, save the Python script.
 
+For instructions on adding InfluxDB as a datasource in Grafana, please refer to the [Steps to Add InfluxDB as a Datasource in Grafana](influxdb-grafana-setup.md) section.
+
 
 ### Introduction
 
