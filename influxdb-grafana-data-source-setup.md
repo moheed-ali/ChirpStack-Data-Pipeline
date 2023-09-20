@@ -25,7 +25,7 @@
    - **InfluxDB Details**:
      - **Organization**: Enter the name of the InfluxDB Organization you want to connect to.
      - **Token**: Paste the Token from the InfluxDB
-     - 
+   
    - **Other Settings**:
      - You can configure additional settings like the HTTP method, access, and others as needed.
 
