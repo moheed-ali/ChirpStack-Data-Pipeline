@@ -1,6 +1,0 @@
-# requirements.txt
-
-influxdb-client==1.27.0
-protobuf
-grpcio==1.41.0
-chirpstack-api
