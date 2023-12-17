@@ -4,6 +4,8 @@ from urllib.parse import urlparse, parse_qs
 from chirpstack_api import integration
 from google.protobuf.json_format import Parse
 import csv
+import time
+
 
 class ChirpStackHandler(BaseHTTPRequestHandler):
     json = True
@@ -32,6 +34,7 @@ class ChirpStackHandler(BaseHTTPRequestHandler):
 
         # Extract values from the 'up' object
         row_data = [
+            self.get_timestamp(),
             up.deduplication_id,
             up.time.seconds,
             up.device_info.tenant_id,
@@ -85,6 +88,7 @@ class ChirpStackHandler(BaseHTTPRequestHandler):
         with open(self.csv_filename, mode='a', newline='') as csv_file:
             csv_writer = csv.writer(csv_file)
             csv_writer.writerow(row_data)
+         
 
     def handle_join(self, body):
         join = self.unmarshal(body, integration.JoinEvent())
@@ -106,6 +110,7 @@ class ChirpStackHandler(BaseHTTPRequestHandler):
 
     def write_csv_headers(self):
         header_row = [
+            "Timestamp",
             "Deduplication ID",
             "Time Seconds",
             "Tenant ID",
@@ -135,3 +140,6 @@ class ChirpStackHandler(BaseHTTPRequestHandler):
         with open(self.csv_filename, mode='a', newline='') as csv_file:
             csv_writer = csv.writer(csv_file)
             csv_writer.writerow(header_row)
+    
+    def get_timestamp(self):
+        return int(time.time())
