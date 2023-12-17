@@ -1,4 +1,4 @@
-# handlers.py
+# event_handlers.py
 from http.server import BaseHTTPRequestHandler
 from urllib.parse import urlparse, parse_qs
 from chirpstack_api import integration
