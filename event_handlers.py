@@ -1,11 +1,9 @@
-# event_handlers.py
 from http.server import BaseHTTPRequestHandler
 from urllib.parse import urlparse, parse_qs
 from chirpstack_api import integration
 from google.protobuf.json_format import Parse
 import csv
 import time
-
 
 class ChirpStackHandler(BaseHTTPRequestHandler):
     json = True
@@ -29,11 +27,31 @@ class ChirpStackHandler(BaseHTTPRequestHandler):
             print(f"Handler for event {event_type} is not implemented")
 
     def handle_uplink(self, body):
+        """
+        Handles the ChirpStack uplink event.
+        Extracts information from the uplink event and writes it to a CSV file, considering multiple gateways.
+
+        Parameters:
+            body (bytes): The raw request body containing the ChirpStack UplinkEvent.
+
+        Logic:
+            - Unmarshals the ChirpStack UplinkEvent from the JSON body.
+            - Extracts common data for all gateways.
+            - Checks if the CSV file exists and writes headers if not.
+            - Iterates through each gateway's rxInfo, copies common data, and appends gateway-specific information.
+            - Extracts txInfo values (common for all gateways) and appends them to the row data.
+            - Writes the row data to the CSV file.
+
+        Note:
+            This logic ensures that a new row is created for each gateway's information, while common data for the
+            uplink event is consistent across all rows.
+        """
+        
         up = self.unmarshal(body, integration.UplinkEvent())
         print(f"Uplink received from: {up.device_info.device_name} with F count: {up.f_cnt}")
 
-        # Extract values from the 'up' object
-        row_data = [
+        # Extract values from the 'up' object (common for all gateways)
+        common_data = [
             self.get_timestamp(),
             up.deduplication_id,
             up.time.seconds,
@@ -52,43 +70,43 @@ class ChirpStackHandler(BaseHTTPRequestHandler):
             up.f_cnt
         ]
 
-        # Extract rxInfo values
-        rx_info_values = []
-        for rx_info in up.rx_info:
-            rx_info_values.append([
-                rx_info.gateway_id,
-                rx_info.uplink_id,
-                rx_info.rssi,
-                rx_info.snr,
-                rx_info.context
-            ])
-
-        # Extract txInfo values
-        if up.HasField('tx_info'):
-            tx_info = up.tx_info
-            tx_info_values = [
-                tx_info.frequency,
-                tx_info.modulation.lora.bandwidth,
-                tx_info.modulation.lora.spreading_factor,
-                tx_info.modulation.lora.code_rate
-            ]
-        else:
-            tx_info_values = ["", "", "", ""]
-
-        # Flatten the rx_info_values and append tx_info_values
-        flattened_rx_info = [item for sublist in rx_info_values for item in sublist]
-        row_data.extend(flattened_rx_info)
-        row_data.extend(tx_info_values)
-
         # Check if the CSV file exists and write headers if not
         if not self.does_csv_exist():
             self.write_csv_headers()
 
-        # Open the CSV file in append mode and write the row data
+        # Open the CSV file in append mode and write the common data
         with open(self.csv_filename, mode='a', newline='') as csv_file:
             csv_writer = csv.writer(csv_file)
-            csv_writer.writerow(row_data)
-         
+
+            # Extract rxInfo values for each gateway
+            for rx_info in up.rx_info:
+                row_data = common_data.copy()
+
+                rx_info_values = [
+                    rx_info.gateway_id,
+                    rx_info.uplink_id,
+                    rx_info.rssi,
+                    rx_info.snr,
+                    rx_info.context
+                ]
+
+                row_data.extend(rx_info_values)
+
+                # Extract txInfo values (common for all gateways)
+                if up.HasField('tx_info'):
+                    tx_info = up.tx_info
+                    tx_info_values = [
+                        tx_info.frequency,
+                        tx_info.modulation.lora.bandwidth,
+                        tx_info.modulation.lora.spreading_factor,
+                        tx_info.modulation.lora.code_rate
+                    ]
+                    row_data.extend(tx_info_values)
+                else:
+                    row_data.extend(["", "", "", ""])
+
+                # Write the row data to the CSV file
+                csv_writer.writerow(row_data)
 
     def handle_join(self, body):
         join = self.unmarshal(body, integration.JoinEvent())
@@ -140,6 +158,6 @@ class ChirpStackHandler(BaseHTTPRequestHandler):
         with open(self.csv_filename, mode='a', newline='') as csv_file:
             csv_writer = csv.writer(csv_file)
             csv_writer.writerow(header_row)
-    
+
     def get_timestamp(self):
         return int(time.time())
