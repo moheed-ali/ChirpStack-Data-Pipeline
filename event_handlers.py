@@ -4,10 +4,15 @@ from chirpstack_api import integration
 from google.protobuf.json_format import Parse
 import csv
 import time
+import subprocess
+import sys
+
+docker_images = ["5d3a2f93eb20", "0e734c94da99", "f9e5c766cf94", "a64000d6807e"] 
+
 
 class ChirpStackHandler(BaseHTTPRequestHandler):
     json = True
-    csv_filename = "data.csv"
+    csv_filename = "up_data.csv"
 
     def do_POST(self):
         self.send_response(200)
@@ -21,10 +26,17 @@ class ChirpStackHandler(BaseHTTPRequestHandler):
 
         if event_type == "up":
             self.handle_uplink(body)
+        if event_type == "down":
+            self.handle_downlink(body)    
         elif event_type == "join":
             self.handle_join(body)
         else:
+            # print("No");
             print(f"Handler for event {event_type} is not implemented")
+
+    def handle_downlink(self, body):
+        down = self.unmarshal(body, integration.DownlinkEvent())
+        print("Downlink received for device: %s with payload: %s" % (down.device_info.dev_eui, down.data.hex()))    
 
     def handle_uplink(self, body):
         """
@@ -105,6 +117,11 @@ class ChirpStackHandler(BaseHTTPRequestHandler):
                 else:
                     row_data.extend(["", "", "", ""])
 
+                docker_stats = self.get_docker_stats(docker_images)
+                
+                for stat in docker_stats:
+                    row_data.extend(stat)
+                
                 # Write the row data to the CSV file
                 csv_writer.writerow(row_data)
 
@@ -152,7 +169,35 @@ class ChirpStackHandler(BaseHTTPRequestHandler):
             "txInfo Frequency",
             "Modulation-lora txInfo Bandwidth",
             "Modulation-lora Spreading Factor",
-            "Modulation-lora Code Rate"
+            "Modulation-lora Code Rate",
+            "Container",
+            "Name",
+            "CPUPerc",
+            "MemUsage",
+            "NetIO",
+            "BlockIO",
+            "PIDs",
+            "Container",
+             "Name",
+            "CPUPerc",
+            "MemUsage",
+            "NetIO",
+            "BlockIO",
+            "PIDs",
+            "Container",
+            "Name",
+            "CPUPerc",
+            "MemUsage",
+            "NetIO",
+            "BlockIO",
+            "PIDs",
+            "Container",
+            "Name",
+            "CPUPerc",
+            "MemUsage",
+            "NetIO",
+            "BlockIO",
+            "PIDs"       
         ]
 
         with open(self.csv_filename, mode='a', newline='') as csv_file:
@@ -161,3 +206,21 @@ class ChirpStackHandler(BaseHTTPRequestHandler):
 
     def get_timestamp(self):
         return int(time.time())
+    
+    def get_docker_stats(self, container_names):
+        try:
+            # Run the docker stats command for multiple containers
+            result = subprocess.run(
+                ['docker', 'stats', '--no-stream', '--format', '{{.Container}},{{.Name}},{{.CPUPerc}},{{.MemUsage}},{{.NetIO}},{{.BlockIO}},{{.PIDs}}'] + container_names,
+                capture_output=True, text=True
+            )
+
+            # Check if the command was successful
+            if result.returncode == 0:
+                # Split the output into lines and filter out empty lines
+                stats = [line.split(',') for line in result.stdout.split('\n') if line.strip()]
+                return stats
+            else:
+                return [f'Error running docker stats command for containers {", ".join(container_names)}']
+        except Exception as e:
+            return [f'Error: {str(e)}']
