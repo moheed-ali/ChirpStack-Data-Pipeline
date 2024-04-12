@@ -7,7 +7,7 @@ import time
 import subprocess
 import sys
 
-docker_images = ["5d3a2f93eb20", "0e734c94da99", "f9e5c766cf94", "a64000d6807e"] 
+# docker_images = ["5d3a2f93eb20", "0e734c94da99", "f9e5c766cf94", "a64000d6807e"] 
 
 
 class ChirpStackHandler(BaseHTTPRequestHandler):
@@ -117,10 +117,10 @@ class ChirpStackHandler(BaseHTTPRequestHandler):
                 else:
                     row_data.extend(["", "", "", ""])
 
-                docker_stats = self.get_docker_stats(docker_images)
+                # docker_stats = self.get_docker_stats(docker_images)
                 
-                for stat in docker_stats:
-                    row_data.extend(stat)
+                # for stat in docker_stats:
+                #     row_data.extend(stat)
                 
                 # Write the row data to the CSV file
                 csv_writer.writerow(row_data)
@@ -169,35 +169,7 @@ class ChirpStackHandler(BaseHTTPRequestHandler):
             "txInfo Frequency",
             "Modulation-lora txInfo Bandwidth",
             "Modulation-lora Spreading Factor",
-            "Modulation-lora Code Rate",
-            "Container",
-            "Name",
-            "CPUPerc",
-            "MemUsage",
-            "NetIO",
-            "BlockIO",
-            "PIDs",
-            "Container",
-             "Name",
-            "CPUPerc",
-            "MemUsage",
-            "NetIO",
-            "BlockIO",
-            "PIDs",
-            "Container",
-            "Name",
-            "CPUPerc",
-            "MemUsage",
-            "NetIO",
-            "BlockIO",
-            "PIDs",
-            "Container",
-            "Name",
-            "CPUPerc",
-            "MemUsage",
-            "NetIO",
-            "BlockIO",
-            "PIDs"       
+            "Modulation-lora Code Rate"      
         ]
 
         with open(self.csv_filename, mode='a', newline='') as csv_file:
@@ -207,20 +179,20 @@ class ChirpStackHandler(BaseHTTPRequestHandler):
     def get_timestamp(self):
         return int(time.time())
     
-    def get_docker_stats(self, container_names):
-        try:
-            # Run the docker stats command for multiple containers
-            result = subprocess.run(
-                ['docker', 'stats', '--no-stream', '--format', '{{.Container}},{{.Name}},{{.CPUPerc}},{{.MemUsage}},{{.NetIO}},{{.BlockIO}},{{.PIDs}}'] + container_names,
-                capture_output=True, text=True
-            )
+    # def get_docker_stats(self, container_names):
+    #     try:
+    #         # Run the docker stats command for multiple containers
+    #         result = subprocess.run(
+    #             ['docker', 'stats', '--no-stream', '--format', '{{.Container}},{{.Name}},{{.CPUPerc}},{{.MemUsage}},{{.NetIO}},{{.BlockIO}},{{.PIDs}}'] + container_names,
+    #             capture_output=True, text=True
+    #         )
 
-            # Check if the command was successful
-            if result.returncode == 0:
-                # Split the output into lines and filter out empty lines
-                stats = [line.split(',') for line in result.stdout.split('\n') if line.strip()]
-                return stats
-            else:
-                return [f'Error running docker stats command for containers {", ".join(container_names)}']
-        except Exception as e:
-            return [f'Error: {str(e)}']
+    #         # Check if the command was successful
+    #         if result.returncode == 0:
+    #             # Split the output into lines and filter out empty lines
+    #             stats = [line.split(',') for line in result.stdout.split('\n') if line.strip()]
+    #             return stats
+    #         else:
+    #             return [f'Error running docker stats command for containers {", ".join(container_names)}']
+    #     except Exception as e:
+    #         return [f'Error: {str(e)}']
