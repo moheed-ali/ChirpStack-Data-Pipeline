@@ -13,7 +13,7 @@ import sys
 class ChirpStackHandler(BaseHTTPRequestHandler):
     json = True
     csv_filename = "up_data.csv"
-    
+    csv_filename1 = "join_data.csv"
     csv_filename2 = "log_data.csv"
 
     def do_POST(self):
