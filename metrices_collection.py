@@ -81,8 +81,8 @@ class Handler(BaseHTTPRequestHandler):
         row_data.extend(tx_info_values)
 
         # Check if the CSV file exists and write headers if not
-        if not self.does_csv_exist():
-            self.write_csv_headers()
+        if not self.does_up_csv_exist():
+            self.write_up_csv_headers()
 
         # Open the CSV file in append mode and write the row data
         with open(self.csv_filename, mode='a', newline='') as csv_file:
@@ -93,6 +93,25 @@ class Handler(BaseHTTPRequestHandler):
         join = self.unmarshal(body, integration.JoinEvent())
         print("Device: %s joined with DevAddr: %s" % (join.device_info.dev_eui, join.dev_addr))
 
+        join_row_data = [
+            join.deduplication_id,
+            join.time,
+            join.tenantId,
+            join.tenantName,
+            join.applicationId,
+            join.applicationName,
+            join.deviceProfileId,
+            join.deviceProfileName,
+            join.deviceName,
+            join.devEui,
+            join.devAddr
+        ]
+
+        
+
+
+
+
     def unmarshal(self, body, pl):
         if self.json:
             return Parse(body, pl)
@@ -100,14 +119,14 @@ class Handler(BaseHTTPRequestHandler):
         pl.ParseFromString(body)
         return pl
 
-    def does_csv_exist(self):
+    def does_up_csv_exist(self):
         try:
             with open(self.csv_filename, 'r'):
                 return True
         except FileNotFoundError:
             return False
 
-    def write_csv_headers(self):
+    def write_up_csv_headers(self):
         header_row = [
             "Deduplication ID",
             "Time Seconds",
