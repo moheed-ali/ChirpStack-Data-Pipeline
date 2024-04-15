@@ -16,6 +16,7 @@ class ChirpStackHandler(BaseHTTPRequestHandler):
     csv_filename0 = "ack_data.csv"
     csv_filename1 = "join_data.csv"
     csv_filename2 = "log_data.csv"
+    csv_filename3 = "status_data.csv"
 
     def do_POST(self):
         self.send_response(200)
@@ -37,6 +38,8 @@ class ChirpStackHandler(BaseHTTPRequestHandler):
             self.handle_log(body)
         elif event_type == "ack":
             self.handle_ack(body)
+        elif event_type == "status":
+            self.handle_status(body)
         else:
             # print("No");
             print(f"Handler for event {event_type} is not implemented")
@@ -223,6 +226,37 @@ class ChirpStackHandler(BaseHTTPRequestHandler):
             # Write the row data to the CSV file
             csv_writer.writerow(log_row_data)
 
+    def handle_status(self, body):
+        status = self.unmarshal(body, integration.StatusEvent())
+        print("Status received for device: %s with battery Level: %s" % (status.device_info.dev_eui, status.battery_level))   
+
+        ack_row_data = [
+            status.deduplication_id,
+            status.time.seconds,
+            status.device_info.tenant_id,
+            status.device_info.tenant_name,
+            status.device_info.application_id,
+            status.device_info.application_name,
+            status.device_info.device_profile_id,
+            status.device_info.device_profile_name,
+            status.device_info.device_name,
+            status.device_info.dev_eui,
+            status.margin,
+            status.external_power_source,
+            status.battery_level_unavailable,
+            status.battery_level
+        ] 
+
+        if not self.does_status_csv_exist():
+            self.write_ack_status_headers()   
+
+        # Open the CSV file in append mode and write the common data
+        with open(self.csv_filename2, mode='a', newline='') as csv_file:
+            csv_writer = csv.writer(csv_file)
+
+            # Write the row data to the CSV file
+            csv_writer.writerow(ack_row_data) 
+
     def unmarshal(self, body, pl):
         if self.json:
             return Parse(body, pl)
@@ -254,6 +288,13 @@ class ChirpStackHandler(BaseHTTPRequestHandler):
     def does_ack_csv_exist(self):
         try:
             with open(self.csv_filename0, 'r'):
+                return True
+        except FileNotFoundError:
+            return False
+        
+    def does_status_csv_exist(self):
+        try:
+            with open(self.csv_filename3, 'r'):
                 return True
         except FileNotFoundError:
             return False
@@ -349,6 +390,28 @@ class ChirpStackHandler(BaseHTTPRequestHandler):
         ]
 
         with open(self.csv_filename0, mode='a', newline='') as csv_file:
+            csv_writer = csv.writer(csv_file)
+            csv_writer.writerow(header_row)
+    
+    def write_status_csv_headers(self):
+        header_row = [
+            "Deduplication Id",
+            "Time Seconds",
+            "Tenant ID",
+            "Tenant Name",
+            "Application ID",
+            "Application Name",
+            "Device Profile ID",
+            "Device Profile Name",
+            "Device Name",
+            "Dev EUI",
+            "Magin",
+            "External Power Source",
+            "Battery Level Unavailable",
+            "Battery Level"     
+        ]
+
+        with open(self.csv_filename3, mode='a', newline='') as csv_file:
             csv_writer = csv.writer(csv_file)
             csv_writer.writerow(header_row)
 
