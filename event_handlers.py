@@ -13,6 +13,7 @@ import sys
 class ChirpStackHandler(BaseHTTPRequestHandler):
     json = True
     csv_filename = "up_data.csv"
+    csv_filename0 = "ack_data.csv"
     csv_filename1 = "join_data.csv"
     csv_filename2 = "log_data.csv"
 
@@ -34,6 +35,8 @@ class ChirpStackHandler(BaseHTTPRequestHandler):
             self.handle_join(body)
         elif event_type == "log":
             self.handle_log(body)
+        elif event_type == "ack":
+            self.handle_ack(body)
         else:
             # print("No");
             print(f"Handler for event {event_type} is not implemented")
@@ -129,6 +132,36 @@ class ChirpStackHandler(BaseHTTPRequestHandler):
                 # Write the row data to the CSV file
                 csv_writer.writerow(row_data)
 
+    def handle_ack(self, body):
+        ack = self.unmarshal(body, integration.AckEvent())
+        print("Ack received for device: %s with fCntDown: %s" % (ack.device_info.dev_eui, ack.f_cnt_down))   
+
+        ack_row_data = [
+            ack.deduplication_id,
+            ack.time.seconds,
+            ack.device_info.tenant_id,
+            ack.device_info.tenant_name,
+            ack.device_info.application_id,
+            ack.device_info.application_name,
+            ack.device_info.device_profile_id,
+            ack.device_info.device_profile_name,
+            ack.device_info.device_name,
+            ack.device_info.dev_eui,
+            ack.queue_item_id,
+            ack.acknowledged,
+            ack.f_cnt_down
+        ] 
+
+        if not self.does_ack_csv_exist():
+            self.write_ack_csv_headers()   
+
+        # Open the CSV file in append mode and write the common data
+        with open(self.csv_filename2, mode='a', newline='') as csv_file:
+            csv_writer = csv.writer(csv_file)
+
+            # Write the row data to the CSV file
+            csv_writer.writerow(ack_row_data) 
+
     def handle_join(self, body):
         join = self.unmarshal(body, integration.JoinEvent())
         print(f"Device: {join.device_info.dev_eui} joined with DevAddr: {join.dev_addr}")
@@ -217,6 +250,13 @@ class ChirpStackHandler(BaseHTTPRequestHandler):
                 return True
         except FileNotFoundError:
             return False
+    
+    def does_ack_csv_exist(self):
+        try:
+            with open(self.csv_filename0, 'r'):
+                return True
+        except FileNotFoundError:
+            return False
 
     def write_up_csv_headers(self):
         header_row = [
@@ -288,6 +328,27 @@ class ChirpStackHandler(BaseHTTPRequestHandler):
         ]
 
         with open(self.csv_filename1, mode='a', newline='') as csv_file:
+            csv_writer = csv.writer(csv_file)
+            csv_writer.writerow(header_row)
+    
+    def write_ack_csv_headers(self):
+        header_row = [
+            "Deduplication Id",
+            "Time Seconds",
+            "Tenant ID",
+            "Tenant Name",
+            "Application ID",
+            "Application Name",
+            "Device Profile ID",
+            "Device Profile Name",
+            "Device Name",
+            "Dev EUI",
+            "queueItemId",
+            "acknowledged",
+            "fCntDown"     
+        ]
+
+        with open(self.csv_filename0, mode='a', newline='') as csv_file:
             csv_writer = csv.writer(csv_file)
             csv_writer.writerow(header_row)
 
