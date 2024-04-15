@@ -17,6 +17,7 @@ class ChirpStackHandler(BaseHTTPRequestHandler):
     csv_filename1 = "join_data.csv"
     csv_filename2 = "log_data.csv"
     csv_filename3 = "status_data.csv"
+    csv_filename4 = "txack_data.csv"
 
     def do_POST(self):
         self.send_response(200)
@@ -40,6 +41,8 @@ class ChirpStackHandler(BaseHTTPRequestHandler):
             self.handle_ack(body)
         elif event_type == "status":
             self.handle_status(body)
+        elif event_type == "txack":
+            self.handle_txack(body)
         else:
             # print("No");
             print(f"Handler for event {event_type} is not implemented")
@@ -159,7 +162,7 @@ class ChirpStackHandler(BaseHTTPRequestHandler):
             self.write_ack_csv_headers()   
 
         # Open the CSV file in append mode and write the common data
-        with open(self.csv_filename2, mode='a', newline='') as csv_file:
+        with open(self.csv_filename0, mode='a', newline='') as csv_file:
             csv_writer = csv.writer(csv_file)
 
             # Write the row data to the CSV file
@@ -251,11 +254,66 @@ class ChirpStackHandler(BaseHTTPRequestHandler):
             self.write_ack_status_headers()   
 
         # Open the CSV file in append mode and write the common data
-        with open(self.csv_filename2, mode='a', newline='') as csv_file:
+        with open(self.csv_filename3, mode='a', newline='') as csv_file:
             csv_writer = csv.writer(csv_file)
 
             # Write the row data to the CSV file
             csv_writer.writerow(ack_row_data) 
+
+    def handle_txack(self, body):
+        txack = self.unmarshal(body, integration.TxAckEvent())
+        print(f"Uplink received from: {txack.device_info.device_name} with F count: {up.f_cnt}")
+
+        # Extract values from the 'up' object (common for all gateways)
+        common_data = [
+            txack.downlink_id,
+            txack.time.seconds,
+            txack.device_info.tenant_id,
+            txack.device_info.tenant_name,
+            txack.device_info.application_id,
+            txack.device_info.application_name,
+            txack.device_info.device_profile_id,
+            txack.device_info.device_profile_name,
+            txack.device_info.device_name,
+            txack.device_info.dev_eui,
+            txack.queue_item_id,
+            txack.f_cnt_down,
+            txack.gateway_id
+        ]
+
+        # Check if the CSV file exists and write headers if not
+        if not self.does_txack_csv_exist():
+            self.write_txack_csv_headers()
+
+        # Open the CSV file in append mode and write the common data
+        with open(self.csv_filename4, mode='a', newline='') as csv_file:
+            csv_writer = csv.writer(csv_file)
+
+            # Extract rxInfo values for each gateway
+            for tx_info in txack.rx_info:
+                row_data = common_data.copy()
+
+                tx_info_values = [
+                    tx_info.frequency,
+                    tx_info.power,
+                    tx_info.modulation.lora.bandwidth,
+                    tx_info.modulation.lora.spreading_factor,
+                    tx_info.modulation.lora.code_rate,
+                    tx_info.modulation.lora.polarization_inversion,
+                    tx_info.timng.delay.delay,
+                    tx_info.context
+                ]
+
+                row_data.extend(tx_info_values)
+
+
+                # docker_stats = self.get_docker_stats(docker_images)
+                
+                # for stat in docker_stats:
+                #     row_data.extend(stat)
+                
+                # Write the row data to the CSV file
+                csv_writer.writerow(row_data)
 
     def unmarshal(self, body, pl):
         if self.json:
@@ -298,6 +356,13 @@ class ChirpStackHandler(BaseHTTPRequestHandler):
                 return True
         except FileNotFoundError:
             return False
+    
+    def does_txack_csv_exist(self):
+        try:
+            with open(self.csv_filename4, 'r'):
+                return True
+        except FileNotFoundError:
+            return False
 
     def write_up_csv_headers(self):
         header_row = [
@@ -329,6 +394,35 @@ class ChirpStackHandler(BaseHTTPRequestHandler):
         ]
 
         with open(self.csv_filename, mode='a', newline='') as csv_file:
+            csv_writer = csv.writer(csv_file)
+            csv_writer.writerow(header_row)
+
+    def write_txack_csv_headers(self):
+        header_row = [
+            "Downlink ID",
+            "Time Seconds",
+            "Tenant ID",
+            "Tenant Name",
+            "Application ID",
+            "Application Name",
+            "Device Profile ID",
+            "Device Profile Name",
+            "Device Name",
+            "Dev EUI",
+            "Queue Item Id",
+            "fCnt Down",
+            "Gateway Id",
+            "txInfo Frequency",
+            "txInfo Power",
+            "Modulation-lora txInfo Bandwidth",
+            "Modulation-lora Spreading Factor",
+            "Modulation-lora Code Rate" 
+            "Modulation-lora Polarization Inversion",
+            "Timing-Delay",
+            "Context"
+        ]
+
+        with open(self.csv_filename4, mode='a', newline='') as csv_file:
             csv_writer = csv.writer(csv_file)
             csv_writer.writerow(header_row)
 
