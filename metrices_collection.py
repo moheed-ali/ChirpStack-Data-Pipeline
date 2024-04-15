@@ -23,6 +23,9 @@ class Handler(BaseHTTPRequestHandler):
             self.up(body)
 
         elif query_args["event"][0] == "join":
+            self.log(body)
+
+        elif query_args["event"][0] == "join":
             self.join(body)
 
         else:
@@ -91,23 +94,44 @@ class Handler(BaseHTTPRequestHandler):
 
     def join(self, body):
         join = self.unmarshal(body, integration.JoinEvent())
-        print("Device: %s joined with DevAddr: %s" % (join.device_info.dev_eui, join.dev_addr))
+        print("Device: %s joined with Device Name : %s" % (join.device_info.dev_eui, join.dev_addr))
 
         join_row_data = [
             join.deduplication_id,
-            join.time,
-            join.tenantId,
-            join.tenantName,
-            join.applicationId,
-            join.applicationName,
-            join.deviceProfileId,
-            join.deviceProfileName,
-            join.deviceName,
-            join.devEui,
+            join.time.seconds,
+            join.device_info.tenant_id,
+            join.device_info.tenant_name,
+            join.device_info.application_id,
+            join.device_info.application_name,
+            join.device_info.device_profile_id,
+            join.device_info.device_profile_name,
+            join.device_info.device_name,
+            join.device_info.dev_eui,
             join.devAddr
         ]
 
-        
+    def log(self,body):
+        log = self.unmarshal(body, integration.LogEvent())
+        print("Device: %s joined with DevAddr: %s" % (log.device_info.dev_eui, log.dev_addr))
+        log_row_data = [
+            log.deduplication_id,
+            log.time.seconds,
+            log.device_info.tenant_id,
+            log.device_info.tenant_name,
+            log.device_info.application_id,
+            log.device_info.application_name,
+            log.device_info.device_profile_id,
+            log.device_info.device_profile_name,
+            log.device_info.device_name,
+            log.device_info.dev_eui,
+            log.level,
+            log.code,
+            log.description,
+            log.context.deduplication_id
+        ]
+
+        if not self.does_log_csv_exist():
+            self.write_log_csv_headers()
 
 
 
@@ -125,6 +149,36 @@ class Handler(BaseHTTPRequestHandler):
                 return True
         except FileNotFoundError:
             return False
+    
+    def does_log_csv_exist(self):
+        try:
+            with open(self.csv_filename, 'r'):
+                return True
+        except FileNotFoundError:
+            return False
+
+    def write_log_csv_headers(self):
+        header_row = [
+            "Deduplication ID",
+            "Time Seconds",
+            "Tenant ID",
+            "Tenant Name",
+            "Application ID",
+            "Application Name",
+            "Device Profile ID",
+            "Device Profile Name",
+            "Device Name",
+            "Dev EUI",
+            # "Tags Key",
+            "Log Level",
+            "Log code",
+            "Log Description",
+            "Log Context"
+        ]
+
+        with open(self.csv_filename, mode='a', newline='') as csv_file:
+            csv_writer = csv.writer(csv_file)
+            csv_writer.writerow(header_row)
 
     def write_up_csv_headers(self):
         header_row = [
