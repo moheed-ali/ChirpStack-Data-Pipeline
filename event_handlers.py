@@ -13,6 +13,8 @@ import sys
 class ChirpStackHandler(BaseHTTPRequestHandler):
     json = True
     csv_filename = "up_data.csv"
+    
+    csv_filename2 = "log_data.csv"
 
     def do_POST(self):
         self.send_response(200)
@@ -26,10 +28,12 @@ class ChirpStackHandler(BaseHTTPRequestHandler):
 
         if event_type == "up":
             self.handle_uplink(body)
-        if event_type == "down":
+        elif event_type == "down":
             self.handle_downlink(body)    
         elif event_type == "join":
             self.handle_join(body)
+        elif event_type == "log":
+            self.handle_log(body)
         else:
             # print("No");
             print(f"Handler for event {event_type} is not implemented")
@@ -83,8 +87,8 @@ class ChirpStackHandler(BaseHTTPRequestHandler):
         ]
 
         # Check if the CSV file exists and write headers if not
-        if not self.does_csv_exist():
-            self.write_csv_headers()
+        if not self.does_up_csv_exist():
+            self.write_up_csv_headers()
 
         # Open the CSV file in append mode and write the common data
         with open(self.csv_filename, mode='a', newline='') as csv_file:
@@ -129,6 +133,63 @@ class ChirpStackHandler(BaseHTTPRequestHandler):
         join = self.unmarshal(body, integration.JoinEvent())
         print(f"Device: {join.device_info.dev_eui} joined with DevAddr: {join.dev_addr}")
 
+        join_row_data = [
+            join.deduplication_id,
+            join.time.seconds,
+            join.device_info.tenant_id,
+            join.device_info.tenant_name,
+            join.device_info.application_id,
+            join.device_info.application_name,
+            join.device_info.device_profile_id,
+            join.device_info.device_profile_name,
+            join.device_info.device_name,
+            join.device_info.dev_eui,
+            join.devAddr
+        ]
+
+        # Check if the CSV file exists and write headers if not
+        if not self.does_join_csv_exist():
+            self.write_join_csv_headers()
+        
+        with open(self.csv_filename1, mode='a', newline='') as csv_file:
+            csv_writer = csv.writer(csv_file)
+
+            # Write the row data to the CSV file
+            csv_writer.writerow(join_row_data)
+
+    def handle_log(self, body):
+        log = self.unmarshal(body, integration.LogEvent())
+        print("Device: %s joined with Dev. Name: %s" % (log.device_info.dev_eui, log.device_info.device_name))
+        
+        
+        log_row_data = [
+            log.time.seconds,
+            log.device_info.tenant_id,
+            log.device_info.tenant_name,
+            log.device_info.application_id,
+            log.device_info.application_name,
+            log.device_info.device_profile_id,
+            log.device_info.device_profile_name,
+            log.device_info.device_name,
+            log.device_info.dev_eui,
+            log.level,
+            log.code,
+            log.description,
+            log.context["deduplication_id"]
+            
+        ]
+
+        # Check if the CSV file exists and write headers if not
+        if not self.does_log_csv_exist():
+            self.write_log_csv_headers()
+        
+        # Open the CSV file in append mode and write the common data
+        with open(self.csv_filename2, mode='a', newline='') as csv_file:
+            csv_writer = csv.writer(csv_file)
+
+            # Write the row data to the CSV file
+            csv_writer.writerow(log_row_data)
+
     def unmarshal(self, body, pl):
         if self.json:
             return Parse(body, pl)
@@ -136,14 +197,28 @@ class ChirpStackHandler(BaseHTTPRequestHandler):
         pl.ParseFromString(body)
         return pl
 
-    def does_csv_exist(self):
+    def does_up_csv_exist(self):
         try:
             with open(self.csv_filename, 'r'):
                 return True
         except FileNotFoundError:
             return False
 
-    def write_csv_headers(self):
+    def does_log_csv_exist(self):
+        try:
+            with open(self.csv_filename2, 'r'):
+                return True
+        except FileNotFoundError:
+            return False
+        
+    def does_join_csv_exist(self):
+        try:
+            with open(self.csv_filename1, 'r'):
+                return True
+        except FileNotFoundError:
+            return False
+
+    def write_up_csv_headers(self):
         header_row = [
             "Timestamp",
             "Deduplication ID",
@@ -173,6 +248,46 @@ class ChirpStackHandler(BaseHTTPRequestHandler):
         ]
 
         with open(self.csv_filename, mode='a', newline='') as csv_file:
+            csv_writer = csv.writer(csv_file)
+            csv_writer.writerow(header_row)
+
+    def write_log_csv_headers(self):
+        header_row = [
+            "Time Seconds",
+            "Tenant ID",
+            "Tenant Name",
+            "Application ID",
+            "Application Name",
+            "Device Profile ID",
+            "Device Profile Name",
+            "Device Name",
+            "Dev EUI",
+            "Log Level",
+            "Log Code", 
+            "Log Description",
+            "Log Context"      
+        ]
+
+        with open(self.csv_filename2, mode='a', newline='') as csv_file:
+            csv_writer = csv.writer(csv_file)
+            csv_writer.writerow(header_row)
+    
+    def write_join_csv_headers(self):
+        header_row = [
+            "Deduplication Id",
+            "Time Seconds",
+            "Tenant ID",
+            "Tenant Name",
+            "Application ID",
+            "Application Name",
+            "Device Profile ID",
+            "Device Profile Name",
+            "Device Name",
+            "Dev EUI",
+            "Dev Addr"     
+        ]
+
+        with open(self.csv_filename1, mode='a', newline='') as csv_file:
             csv_writer = csv.writer(csv_file)
             csv_writer.writerow(header_row)
 
