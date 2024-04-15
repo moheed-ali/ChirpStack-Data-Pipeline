@@ -19,6 +19,7 @@ class ChirpStackHandler(BaseHTTPRequestHandler):
     csv_filename3 = "status_data.csv"
     csv_filename4 = "txack_data.csv"
     csv_filename5 = "location_data.csv"
+    csv_filename6 = "integration_data.csv"
 
     def do_POST(self):
         self.send_response(200)
@@ -44,6 +45,8 @@ class ChirpStackHandler(BaseHTTPRequestHandler):
             self.handle_status(body)
         elif event_type == "txack":
             self.handle_txack(body)
+        elif event_type == "integration":
+            self.handle_integration(body)
         else:
             # print("No");
             print(f"Handler for event {event_type} is not implemented")
@@ -77,8 +80,6 @@ class ChirpStackHandler(BaseHTTPRequestHandler):
 
             # Write the row data to the CSV file
             csv_writer.writerow(loc_row_data) 
-
-
 
     def handle_uplink(self, body):
         """
@@ -335,14 +336,38 @@ class ChirpStackHandler(BaseHTTPRequestHandler):
 
                 row_data.extend(tx_info_values)
 
-
-                # docker_stats = self.get_docker_stats(docker_images)
-                
-                # for stat in docker_stats:
-                #     row_data.extend(stat)
-                
-                # Write the row data to the CSV file
                 csv_writer.writerow(row_data)
+
+    def handle_integration(self, body):
+        inte = self.unmarshal(body, integration.IntegrationEvent())
+        print(f"Uplink received from: {inte.device_info.device_name} with F count: {inte.f_cnt}")
+
+        # Extract values from the 'up' object (common for all gateways)
+        inte_data = [
+            inte.deduplication_id,
+            inte.time.seconds,
+            inte.device_info.tenant_id,
+            inte.device_info.tenant_name,
+            inte.device_info.application_id,
+            inte.device_info.application_name,
+            inte.device_info.device_profile_id,
+            inte.device_info.device_profile_name,
+            inte.device_info.device_name,
+            inte.device_info.dev_eui,
+            inte.integration_name,
+            inte.event_type,
+            inte.object
+        ]
+
+        if not self.does_inte_csv_exist():
+            self.write_inte_status_headers()   
+
+        # Open the CSV file in append mode and write the common data
+        with open(self.csv_filename6, mode='a', newline='') as csv_file:
+            csv_writer = csv.writer(csv_file)
+
+            # Write the row data to the CSV file
+            csv_writer.writerow(inte_data)         
 
     def unmarshal(self, body, pl):
         if self.json:
@@ -396,6 +421,13 @@ class ChirpStackHandler(BaseHTTPRequestHandler):
     def does_txack_csv_exist(self):
         try:
             with open(self.csv_filename4, 'r'):
+                return True
+        except FileNotFoundError:
+            return False
+        
+    def does_inte_csv_exist(self):
+        try:
+            with open(self.csv_filename6, 'r'):
                 return True
         except FileNotFoundError:
             return False
@@ -459,6 +491,27 @@ class ChirpStackHandler(BaseHTTPRequestHandler):
         ]
 
         with open(self.csv_filename4, mode='a', newline='') as csv_file:
+            csv_writer = csv.writer(csv_file)
+            csv_writer.writerow(header_row)
+
+    def write_inte_csv_headers(self):
+        header_row = [
+            "Deduplication ID",
+            "Time Seconds",
+            "Tenant ID",
+            "Tenant Name",
+            "Application ID",
+            "Application Name",
+            "Device Profile ID",
+            "Device Profile Name",
+            "Device Name",
+            "Dev EUI",
+            "Integration Name",
+            "Event Type",
+            "Object"
+        ]
+
+        with open(self.csv_filename6, mode='a', newline='') as csv_file:
             csv_writer = csv.writer(csv_file)
             csv_writer.writerow(header_row)
 
