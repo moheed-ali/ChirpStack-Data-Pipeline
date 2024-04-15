@@ -18,6 +18,7 @@ class ChirpStackHandler(BaseHTTPRequestHandler):
     csv_filename2 = "log_data.csv"
     csv_filename3 = "status_data.csv"
     csv_filename4 = "txack_data.csv"
+    csv_filename5 = "location_data.csv"
 
     def do_POST(self):
         self.send_response(200)
@@ -31,8 +32,8 @@ class ChirpStackHandler(BaseHTTPRequestHandler):
 
         if event_type == "up":
             self.handle_uplink(body)
-        elif event_type == "down":
-            self.handle_downlink(body)    
+        elif event_type == "location":
+            self.handle_location(body)    
         elif event_type == "join":
             self.handle_join(body)
         elif event_type == "log":
@@ -47,9 +48,37 @@ class ChirpStackHandler(BaseHTTPRequestHandler):
             # print("No");
             print(f"Handler for event {event_type} is not implemented")
 
-    def handle_downlink(self, body):
-        down = self.unmarshal(body, integration.DownlinkEvent())
-        print("Downlink received for device: %s with payload: %s" % (down.device_info.dev_eui, down.data.hex()))    
+    def handle_location(self, body):
+        loc = self.unmarshal(body, integration.LocationEvent())
+        print("Location received for device: %s with Application Name: %s" % (loc.device_info.dev_eui, loc.device_info.application_name))    
+
+        loc_row_data = [
+            loc.deduplication_id,
+            loc.time.seconds,
+            loc.device_info.tenant_id,
+            loc.device_info.tenant_name,
+            loc.device_info.application_id,
+            loc.device_info.application_name,
+            loc.device_info.device_profile_id,
+            loc.device_info.device_profile_name,
+            loc.device_info.device_name,
+            loc.device_info.dev_eui,
+            loc.location.latitude,
+            loc.location.longitude,
+            loc.location.altitude
+        ]
+
+        if not self.does_loc_csv_exist():
+            self.write_loc_csv_headers()   
+
+        # Open the CSV file in append mode and write the common data
+        with open(self.csv_filename5, mode='a', newline='') as csv_file:
+            csv_writer = csv.writer(csv_file)
+
+            # Write the row data to the CSV file
+            csv_writer.writerow(loc_row_data) 
+
+
 
     def handle_uplink(self, body):
         """
@@ -198,7 +227,7 @@ class ChirpStackHandler(BaseHTTPRequestHandler):
 
     def handle_log(self, body):
         log = self.unmarshal(body, integration.LogEvent())
-        print("Device: %s joined with Dev. Name: %s" % (log.device_info.dev_eui, log.device_info.device_name))
+        print("Device: %s Logged with Dev. Name: %s" % (log.device_info.dev_eui, log.device_info.device_name))
         
         
         log_row_data = [
@@ -356,6 +385,13 @@ class ChirpStackHandler(BaseHTTPRequestHandler):
                 return True
         except FileNotFoundError:
             return False
+        
+    def does_loc_csv_exist(self):
+        try:
+            with open(self.csv_filename5, 'r'):
+                return True
+        except FileNotFoundError:
+            return False
     
     def does_txack_csv_exist(self):
         try:
@@ -484,6 +520,27 @@ class ChirpStackHandler(BaseHTTPRequestHandler):
         ]
 
         with open(self.csv_filename0, mode='a', newline='') as csv_file:
+            csv_writer = csv.writer(csv_file)
+            csv_writer.writerow(header_row)
+
+    def write_loc_csv_headers(self):
+        header_row = [
+            "Deduplication Id",
+            "Time Seconds",
+            "Tenant ID",
+            "Tenant Name",
+            "Application ID",
+            "Application Name",
+            "Device Profile ID",
+            "Device Profile Name",
+            "Device Name",
+            "Dev EUI",
+            "location latitude",
+            "location longitude",
+            "location altitude"     
+        ]
+
+        with open(self.csv_filename5, mode='a', newline='') as csv_file:
             csv_writer = csv.writer(csv_file)
             csv_writer.writerow(header_row)
     
