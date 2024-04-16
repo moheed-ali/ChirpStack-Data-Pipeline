@@ -1,4 +1,6 @@
 import requests
+from datetime import datetime
+import csv
 
 url = 'http://localhost:9090/api/v1/query'
 query_list = ['up',
@@ -72,19 +74,54 @@ query_list = ['up',
             'storage_redis_conn_get_duration_seconds_count',
             'storage_redis_conn_get_duration_seconds_sum'
             ]
+
+
+# Get the current time
+current_time = datetime.utcnow()
+
+# Format the current time
+formatted_time = current_time.strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3] + 'Z'
+
 params = {
-    'time': '2024-04-16T08:35:58.047357Z'
+    # 'time': '2024-04-16T08:35:58.047357Z'
+    'time': formatted_time
 }
+
+print("Time: ", params['time'])
 
 for query in query_list:
     params['query'] = query
     response = requests.get(url, params=params)
-
     if response.status_code == 200:
         data = response.json()
         if data:
             print(f"Query '{query}' returned data.")
+            # print(data['data']['result'])
             # print(data)
+
+            # Extracting result data
+            result_data = data["data"]["result"]
+
+            # Writing data to CSV file
+            filename = "prom_data.csv"
+            with open(filename, mode='a', newline='') as file:
+                writer = csv.DictWriter(file, fieldnames=["Timestamp", "Event", "Instance", "Job", "Query", "Value"])
+                # Do not write header if the file already exists
+                if file.tell() == 0:
+                    writer.writeheader()
+                for result in result_data:
+                    writer.writerow({
+                        "Timestamp": result["value"][0],
+                        "Query": query,
+                        "Event": result["metric"].get("event", None),
+                        "Instance": result["metric"].get("instance", None),
+                        "Job": result["metric"].get("job", None),
+                        "Value": result["value"][1]
+                    })
+
+            print(f"Data has been written to {filename}")        
+
+
         else:
             print(f"Query '{query}' did not return any data.")
             # print("-----------------------------")
