@@ -76,8 +76,10 @@ query_list = ['up',
             ]
 
 
-# Get the current time
-current_time = datetime.utcnow()
+# Get the current time in the local timezone
+current_time = datetime.now()
+
+print("Current time: ", current_time)
 
 # Format the current time
 formatted_time = current_time.strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3] + 'Z'
