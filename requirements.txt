@@ -1,0 +1,6 @@
+# requirements.txt
+
+influxdb-client
+protobuf
+grpcio
+chirpstack-api
