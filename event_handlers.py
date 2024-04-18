@@ -292,7 +292,7 @@ class ChirpStackHandler(BaseHTTPRequestHandler):
 
     def handle_txack(self, body):
         txack = self.unmarshal(body, integration.TxAckEvent())
-        print(f"Uplink received from: {txack.device_info.device_name} with F count: {up.f_cnt}")
+        print(f"txack received from: {txack.device_info.device_name} with F count: {up.f_cnt}")
 
         # Extract values from the 'up' object (common for all gateways)
         common_data = [
@@ -340,7 +340,7 @@ class ChirpStackHandler(BaseHTTPRequestHandler):
 
     def handle_integration(self, body):
         inte = self.unmarshal(body, integration.IntegrationEvent())
-        print(f"Uplink received from: {inte.device_info.device_name} with F count: {inte.f_cnt}")
+        print(f"Integration received from: {inte.device_info.device_name} with F count: {inte.f_cnt}")
 
         # Extract values from the 'up' object (common for all gateways)
         inte_data = [
