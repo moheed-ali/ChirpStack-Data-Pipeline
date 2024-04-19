@@ -16,6 +16,9 @@ Before you begin, ensure you have the following prerequisites:
    https://www.influxdata.com/blog/docker-monitoring-tutorial-telegraf-influxdb/
    ```
 
+```
+docker cp <container_id_or_name>:/tmp/metrics.out /path/on/your/host/machine/metrics.out
+```
 
 ## Contributing
 
