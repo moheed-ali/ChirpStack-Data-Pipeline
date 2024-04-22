@@ -178,6 +178,69 @@ def json_to_csv_mem(input_file, output_file):
             # Write row to CSV file
             writer.writerow(row)
 
+import csv
+import json
+
+# Function to convert JSON data to net CSV
+def json_to_csv_net(input_file, output_file):
+    with open(input_file, 'r') as in_file, open(output_file, 'w', newline='') as out_file:
+        writer = csv.DictWriter(out_file, fieldnames=['timestamp', 'bytes_recv', 'bytes_sent', 'drop_in', 
+                                                      'drop_out', 'err_in', 'err_out', 'packets_recv', 
+                                                      'packets_sent', 'speed', 'icmp_inaddrmaskreps', 
+                                                      'icmp_inaddrmasks', 'icmp_incsumerrors', 
+                                                      'icmp_indestunreachs', 'icmp_inechoreps', 
+                                                      'icmp_inechos', 'icmp_inerrors', 'icmp_inmsgs', 
+                                                      'icmp_inparmprobs', 'icmp_inredirects', 
+                                                      'icmp_insrcquenchs', 'icmp_intimeexcds', 
+                                                      'icmp_intimestampreps', 'icmp_intimestamps', 
+                                                      'icmp_outaddrmaskreps', 'icmp_outaddrmasks', 
+                                                      'icmp_outdestunreachs', 'icmp_outechoreps', 
+                                                      'icmp_outechos', 'icmp_outerrors', 'icmp_outmsgs', 
+                                                      'icmp_outparmprobs', 'icmp_outratelimitglobal', 
+                                                      'icmp_outratelimithost', 'icmp_outredirects', 
+                                                      'icmp_outsrcquenchs', 'icmp_outtimeexcds', 
+                                                      'icmp_outtimestampreps', 'icmp_outtimestamps', 
+                                                      'ip_defaultttl', 'ip_forwarding', 'ip_forwdatagrams', 
+                                                      'ip_fragcreates', 'ip_fragfails', 'ip_fragoks', 
+                                                      'ip_inaddrerrors', 'ip_indelivers', 'ip_indiscards', 
+                                                      'ip_inhdrerrors', 'ip_inreceives', 'ip_inunknownprotos', 
+                                                      'ip_outdiscards', 'ip_outnoroutes', 'ip_outrequests', 
+                                                      'ip_reasmfails', 'ip_reasmoks', 'ip_reasmreqds', 
+                                                      'ip_reasmtimeout', 'tcp_activeopens', 'tcp_attemptfails', 
+                                                      'tcp_currestab', 'tcp_estabresets', 'tcp_incsumerrors', 
+                                                      'tcp_inerrs', 'tcp_insegs', 'tcp_maxconn', 'tcp_outrsts', 
+                                                      'tcp_outsegs', 'tcp_passiveopens', 'tcp_retranssegs', 
+                                                      'tcp_rtoalgorithm', 'tcp_rtomax', 'tcp_rtomin', 
+                                                      'udp_ignoredmulti', 'udp_incsumerrors', 'udp_indatagrams', 
+                                                      'udp_inerrors', 'udp_memerrors', 'udp_noports', 
+                                                      'udp_outdatagrams', 'udp_rcvbuferrors', 'udp_sndbuferrors', 
+                                                      'udplite_ignoredmulti', 'udplite_incsumerrors', 
+                                                      'udplite_indatagrams', 'udplite_inerrors', 
+                                                      'udplite_memerrors', 'udplite_noports', 
+                                                      'udplite_outdatagrams', 'udplite_rcvbuferrors', 
+                                                      'udplite_sndbuferrors'])
+        writer.writeheader()
+        
+        for line in in_file:
+            data = json.loads(line)
+            flattened_data = flatten_json(data['fields'])
+            row = {'timestamp': data['timestamp']}
+            for key in writer.fieldnames[1:]:
+                row[key] = flattened_data.get(key, 'null')
+            writer.writerow(row)
+
+# Function to flatten nested JSON
+def flatten_json(json_obj, parent_key='', sep='_'):
+    items = {}
+    for key, value in json_obj.items():
+        new_key = parent_key + sep + key if parent_key else key
+        if isinstance(value, dict):
+            items.update(flatten_json(value, new_key, sep=sep))
+        else:
+            items[new_key] = value
+    return items
+
+
 
 
 # Main function to execute the conversions
@@ -186,6 +249,7 @@ def main(input_file):
     json_to_csv_disk(input_file, 'CSV/disk.csv')
     json_to_csv_diskio(input_file, 'CSV/diskio.csv')
     json_to_csv_mem(input_file, 'CSV/mem.csv')
+    json_to_csv_net(input_file, 'CSV/net.csv')
     print("CSV conversion complete.")
 
 # Usage
