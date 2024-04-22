@@ -178,8 +178,35 @@ def json_to_csv_mem(input_file, output_file):
             # Write row to CSV file
             writer.writerow(row)
 
-import csv
-import json
+# Function to convert JSON data to pro CSV
+def json_to_csv_pro(input_file, output_file):
+    with open(input_file, 'r') as infile, open(output_file, 'w', newline='') as outfile:
+        writer = csv.DictWriter(outfile, fieldnames=['timestamp', 'blocked', 'dead', 'idle', 
+                                                     'paging', 'running', 'sleeping', 
+                                                     'stopped', 'total', 'total_threads', 
+                                                     'unknown', 'zombies'])
+        writer.writeheader()
+
+        for line in infile:
+            data = json.loads(line)
+            fields = data.get('fields', {})
+
+            row = {
+                'timestamp': data.get('timestamp', None),
+                'blocked': fields.get('blocked', None),
+                'dead': fields.get('dead', None),
+                'idle': fields.get('idle', None),
+                'paging': fields.get('paging', None),
+                'running': fields.get('running', None),
+                'sleeping': fields.get('sleeping', None),
+                'stopped': fields.get('stopped', None),
+                'total': fields.get('total', None),
+                'total_threads': fields.get('total_threads', None),
+                'unknown': fields.get('unknown', None),
+                'zombies': fields.get('zombies', None)
+            }
+
+            writer.writerow(row)
 
 # Function to convert JSON data to net CSV
 def json_to_csv_net(input_file, output_file):
@@ -250,6 +277,7 @@ def main(input_file):
     json_to_csv_diskio(input_file, 'CSV/diskio.csv')
     json_to_csv_mem(input_file, 'CSV/mem.csv')
     json_to_csv_net(input_file, 'CSV/net.csv')
+    json_to_csv_pro(input_file, 'CSV/pro.csv')
     print("CSV conversion complete.")
 
 # Usage
