@@ -1,6 +1,0 @@
-timestamp,name,tags_host,active,available,available_percent,buffered,cached,commit_limit,committed_as,dirty,free,high_free,high_total,huge_page_size,huge_pages_free,huge_pages_total,inactive,low_free,low_total,mapped,page_tables,shared,slab,sreclaimable,sunreclaim,swap_cached,swap_free,swap_total,total,used,used_percent,vmalloc_chunk,vmalloc_total,vmalloc_used,write_back,write_back_tmp
-1713790270,processes,84418c8daf3f,,,,,,,,,,,,,,,,,,,,,,,,,,,1,,,,,,,
-1713790280,processes,84418c8daf3f,,,,,,,,,,,,,,,,,,,,,,,,,,,1,,,,,,,
-1713790290,processes,84418c8daf3f,,,,,,,,,,,,,,,,,,,,,,,,,,,1,,,,,,,
-1713790300,processes,84418c8daf3f,,,,,,,,,,,,,,,,,,,,,,,,,,,1,,,,,,,
-1713790310,processes,84418c8daf3f,,,,,,,,,,,,,,,,,,,,,,,,,,,1,,,,,,,
