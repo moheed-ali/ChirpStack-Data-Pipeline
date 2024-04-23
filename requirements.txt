@@ -4,3 +4,4 @@ influxdb-client
 protobuf
 grpcio
 chirpstack-api
+schedule
