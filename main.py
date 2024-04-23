@@ -1,6 +1,9 @@
 # main.py
 from chirp_server import ChirpStackServer
 
+# ANSI escape code for yellow text
+YELLOW = "\033[93m"
+RESET = "\033[0m"
 
 if __name__ == "__main__":    
     try:
@@ -8,4 +11,4 @@ if __name__ == "__main__":
             server = ChirpStackServer('', 8081)
             server.serve_forever()
     except KeyboardInterrupt:
-        print("Server stopped.")
+        print(YELLOW + "Server stopped." + RESET)
