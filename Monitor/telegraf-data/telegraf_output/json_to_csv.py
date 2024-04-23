@@ -292,7 +292,37 @@ def json_to_csv_swap(input_file, output_file):
 
             writer.writerow(row)
 
+def json_to_csv_sys(input_file, output_file):
+    # Open input and output files
+    with open(input_file, 'r') as infile, open(output_file, 'w', newline='') as outfile:
+        # Create a CSV writer with fieldnames
+        fieldnames = ['timestamp', 'load1', 'load15', 'load5', 'n_cpus', 'uptime', 'uptime_format']
+        csv_writer = csv.DictWriter(outfile, fieldnames=fieldnames)
+        csv_writer.writeheader()
 
+        # Iterate over lines in the input file
+        for line in infile:
+            # Load JSON from each line
+            data = json.loads(line)
+
+            # Extract relevant fields
+            timestamp = data.get('timestamp')
+            fields = data.get('fields', {})
+            tags = data.get('tags', {})
+
+            # Populate row dictionary
+            row = {
+                'timestamp': timestamp,
+                'load1': fields.get('load1'),
+                'load15': fields.get('load15'),
+                'load5': fields.get('load5'),
+                'n_cpus': fields.get('n_cpus'),
+                'uptime': fields.get('uptime'),
+                'uptime_format': fields.get('uptime_format')
+            }
+
+            # Write row to CSV
+            csv_writer.writerow(row)
 
 # Main function to execute the conversions
 def main(input_file):
@@ -303,6 +333,7 @@ def main(input_file):
     json_to_csv_net(input_file, 'CSV/net.csv')
     json_to_csv_pro(input_file, 'CSV/pro.csv')
     json_to_csv_swap(input_file, 'CSV/swap.csv')
+    json_to_csv_sys(input_file, 'CSV/sys.csv')
     print("CSV conversion complete.")
 
 # Usage
