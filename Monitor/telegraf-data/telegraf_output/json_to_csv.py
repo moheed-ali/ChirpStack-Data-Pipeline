@@ -267,6 +267,30 @@ def flatten_json(json_obj, parent_key='', sep='_'):
             items[new_key] = value
     return items
 
+def json_to_csv_swap(input_file, output_file):
+    with open(input_file, 'r') as infile, open(output_file, 'w', newline='') as outfile:
+        writer = csv.DictWriter(outfile, fieldnames=['timestamp', 'name', 'host', 'free', 'total', 
+                                                     'used', 'used_percent', 'in', 'out'])
+        writer.writeheader()
+
+        for line in infile:
+            data = json.loads(line)
+            fields = data.get('fields', {})
+            tags = data.get('tags', {})
+
+            row = {
+                'timestamp': data.get('timestamp', None),
+                'name': data.get('name', None),
+                'host': tags.get('host', None),
+                'free': fields.get('free', None),
+                'total': fields.get('total', None),
+                'used': fields.get('used', None),
+                'used_percent': fields.get('used_percent', None),
+                'in': fields.get('in', None),
+                'out': fields.get('out', None)
+            }
+
+            writer.writerow(row)
 
 
 
@@ -278,6 +302,7 @@ def main(input_file):
     json_to_csv_mem(input_file, 'CSV/mem.csv')
     json_to_csv_net(input_file, 'CSV/net.csv')
     json_to_csv_pro(input_file, 'CSV/pro.csv')
+    json_to_csv_swap(input_file, 'CSV/swap.csv')
     print("CSV conversion complete.")
 
 # Usage
