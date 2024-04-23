@@ -9,17 +9,20 @@ import sys
 
 # docker_images = ["5d3a2f93eb20", "0e734c94da99", "f9e5c766cf94", "a64000d6807e"] 
 
+# ANSI escape code for yellow text
+YELLOW = "\033[93m"
+RESET = "\033[0m"
 
 class ChirpStackHandler(BaseHTTPRequestHandler):
     json = True
-    csv_filename = "up_data.csv"
-    csv_filename0 = "ack_data.csv"
-    csv_filename1 = "join_data.csv"
-    csv_filename2 = "log_data.csv"
-    csv_filename3 = "status_data.csv"
-    csv_filename4 = "txack_data.csv"
-    csv_filename5 = "location_data.csv"
-    csv_filename6 = "integration_data.csv"
+    csv_filename = "/home/eleve/ChirpStack-Data-Pipeline/OUTPUT/up_data.csv"
+    csv_filename0 = "/home/eleve/ChirpStack-Data-Pipeline/OUTPUT/ack_data.csv"
+    csv_filename1 = "/home/eleve/ChirpStack-Data-Pipeline/OUTPUT/join_data.csv"
+    csv_filename2 = "/home/eleve/ChirpStack-Data-Pipeline/OUTPUT/log_data.csv"
+    csv_filename3 = "/home/eleve/ChirpStack-Data-Pipeline/OUTPUT/status_data.csv"
+    csv_filename4 = "/home/eleve/ChirpStack-Data-Pipeline/OUTPUT/txack_data.csv"
+    csv_filename5 = "/home/eleve/ChirpStack-Data-Pipeline/OUTPUT/location_data.csv"
+    csv_filename6 = "/home/eleve/ChirpStack-Data-Pipeline/OUTPUT/integration_data.csv"
 
     def do_POST(self):
         self.send_response(200)
@@ -103,7 +106,8 @@ class ChirpStackHandler(BaseHTTPRequestHandler):
         """
         
         up = self.unmarshal(body, integration.UplinkEvent())
-        print(f"Uplink received from: {up.device_info.device_name} with F count: {up.f_cnt}")
+        print(YELLOW + f"Uplink received from: {up.device_info.device_name} with F count: {up.f_cnt}" + RESET)
+        # print(f"Uplink received from: {up.device_info.device_name} with F count: {up.f_cnt}")
 
         # Extract values from the 'up' object (common for all gateways)
         common_data = [
