@@ -5,3 +5,4 @@ protobuf
 grpcio
 chirpstack-api
 schedule
+pandas
