@@ -24,6 +24,7 @@ def clean_mem_csv():
     df_mem = df_mem[df_mem['name'] == 'mem']
     df_mem.to_csv('Clean/mem.csv', index=False)
 
+# Function to clean net.csv
 def clean_net_csv():
     df_net = pd.read_csv('net.csv')
     df_net.dropna(subset=['bytes_recv', 'icmp_inaddrmaskreps'], how='all', inplace=True)
@@ -41,6 +42,13 @@ def clean_pro_csv():
     df_pro.dropna(subset=['total_threads'], inplace=True)
     df_pro.to_csv('Clean/pro.csv', index=False)    
 
+# Function to clean sys.csv
+def clean_sys_csv():
+    df_clean = pd.read_csv('sys.csv')
+    df_clean.dropna(subset=['load5', 'uptime', 'uptime_format'], how='all', inplace=True)
+    df_clean.to_csv('Clean/sys.csv', index=False)
+
+
 # Clean each CSV file
 clean_cpu_csv()
 clean_disk_csv()
@@ -49,3 +57,4 @@ clean_mem_csv()
 clean_net_csv()
 clean_pro_csv()
 clean_swap_csv()
+clean_sys_csv()
