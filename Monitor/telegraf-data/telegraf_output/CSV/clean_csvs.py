@@ -9,7 +9,7 @@ def clean_cpu_csv():
 # Function to clean disk.csv
 def clean_disk_csv():
     df_disk = pd.read_csv('disk.csv')
-    df_disk.dropna(subset=['free'], inplace=True)
+    df_disk = df_disk[df_disk['name'] == 'disk']
     df_disk.to_csv('Clean/disk.csv', index=False)
 
 # Function to clean diskio.csv
@@ -18,7 +18,22 @@ def clean_diskio_csv():
     df_diskio = df_diskio[df_diskio['name'] == 'diskio']
     df_diskio.to_csv('Clean/diskio.csv', index=False)
 
+# Function to clean mem.csv
+def clean_mem_csv():
+    df_mem = pd.read_csv('mem.csv')
+    df_mem = df_mem[df_mem['name'] == 'mem']
+    df_mem.to_csv('Clean/mem.csv', index=False)
+
+def clean_net_csv():
+    df_net = pd.read_csv('net.csv')
+    df_net.dropna(subset=['bytes_recv', 'icmp_inaddrmaskreps'], how='all', inplace=True)
+    df_net.to_csv('Clean/net.csv', index=False)
+
+
 # Clean each CSV file
 clean_cpu_csv()
 clean_disk_csv()
 clean_diskio_csv()
+clean_mem_csv()
+clean_net_csv()
+
